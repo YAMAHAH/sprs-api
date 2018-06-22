@@ -27,6 +27,8 @@ SOFTWARE.
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This provides static methods to convert an XML text into a JSONObject, and to
@@ -333,7 +335,7 @@ public class XML {
                 }
                 // attribute = value
                 if (token instanceof String) {
-                    string = (String) token;
+                    string = "_" + (String) token;
                     token = x.nextToken();
                     if (token == EQ) {
                         token = x.nextToken();
@@ -578,18 +580,34 @@ public class XML {
         String string;
 
         if (object instanceof JSONObject) {
-
+            // Loop thru the keys.
+            // don't use the new entrySet accessor to maintain Android Support
+            jo = (JSONObject) object;
             // Emit <tagName>
             if (tagName != null) {
                 sb.append('<');
                 sb.append(tagName);
+                List<String> attrs = jo.keySet()
+                        .stream()
+                        .filter(key->key.startsWith("_"))
+                        .collect(Collectors.toList());
+                for (final String key : attrs) {
+                    Object value = jo.opt(key);
+                    if (value == null) {
+                        value = "";
+                    }else if(value instanceof  String){
+                        value = "\"" + value + "\"";
+                    }
+                    sb.append(" " + key.replace("_","") + "=" + value);
+                }
                 sb.append('>');
             }
 
-            // Loop thru the keys.
-            // don't use the new entrySet accessor to maintain Android Support
-            jo = (JSONObject) object;
-            for (final String key : jo.keySet()) {
+            List<String> attrNodes = jo.keySet()
+                    .stream()
+                    .filter(key-> ! key.startsWith("_"))
+                    .collect(Collectors.toList());
+            for (final String key : attrNodes) {
                 Object value = jo.opt(key);
                 if (value == null) {
                     value = "";

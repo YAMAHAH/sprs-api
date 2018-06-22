@@ -1,5 +1,7 @@
 package com.spsrexpress.apiproxy.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.spsrexpress.apiproxy.utils.HttpRequestUtil;
 import com.spsrexpress.apiproxy.utils.XMLConvertUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,9 @@ import java.io.*;
 @RestController
 @RequestMapping("/spsr")
 public class SPSRController {
+
+    @Autowired
+    private XMLConvertUtil xmlConvertUtil;
 
     @Autowired
     private HttpRequestUtil httpRequestUtil;
@@ -52,8 +57,7 @@ public class SPSRController {
                 + "<Login  Login=\"" + username + "\" Pass=\"" + password +  "\" UserAgent=\"Company name\" />\n" + "</root>";
 
         String res =httpRequestUtil.postRequest(getRequestUrl(), xml);
-        String jsonStr = XMLConvertUtil.xmlToJson(res);
-
+        String jsonStr = xmlConvertUtil.xmlToJson(res);
         return jsonStr;
     }
 
@@ -64,34 +68,34 @@ public class SPSRController {
                 " <Logout Login=\" " + username +  "\" SID=\" " + sId + "\" /> </root>";
 
         String xmlRes = httpRequestUtil.postRequest(getRequestUrl(),reqParam);
-        return XMLConvertUtil.xmlToJson(xmlRes);
+        return xmlConvertUtil.xmlToJson(xmlRes);
     }
 
     @PostMapping(path = "/waGetSpsrOffices",produces = "application/json")
     public String wAGetSpsrOffices(@RequestBody String reqParam) throws IOException{
         String res = httpRequestUtil.postRequest(getRequestUrl(), reqParam);
-        String jsonStr = XMLConvertUtil.xmlToJson(res);
+        String jsonStr = xmlConvertUtil.xmlToJson(res);
         return jsonStr;
     }
 
     @PostMapping(path = "/wAGetStreet",produces = "application/json")
     public String WAGetStreet(@RequestBody String reqParam) throws IOException{
         String res = httpRequestUtil.postRequest(getRequestUrl(), reqParam);
-        String jsonStr = XMLConvertUtil.xmlToJson(res);
+        String jsonStr = xmlConvertUtil.xmlToJson(res);
         return jsonStr;
     }
 
     @PostMapping(path = "/getCities",produces = "application/json")
     public String getCities(@RequestBody String reqParam) throws IOException{
         String res = httpRequestUtil.postRequest(getRequestUrl(),reqParam);
-        String jsonStr = XMLConvertUtil.xmlToJson(res);
+        String jsonStr = xmlConvertUtil.xmlToJson(res);
         return jsonStr;
     }
 
     @PostMapping(path = "/waGetInvoiceInfo",produces = "application/json")
     public String wAGetInvoiceInfo(@RequestBody String reqParam) throws IOException{
         String res = httpRequestUtil.postRequest(getRequestUrl(), reqParam);
-        String jsonStr = XMLConvertUtil.xmlToJson(res);
+        String jsonStr = xmlConvertUtil.xmlToJson(res);
         return jsonStr;
     }
 
@@ -103,10 +107,42 @@ public class SPSRController {
         if( contentType.equalsIgnoreCase("application/xml")){
             res = httpRequestUtil.postRequest(getRequestUrl(), reqParam);
         }else if(contentType.equalsIgnoreCase("application/json")){
-            String reqXml = XMLConvertUtil.jsonToXML(reqParam);
+            String reqXml = xmlConvertUtil.jsonToXML(reqParam);
             res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
         }
-        return XMLConvertUtil.xmlToJson(res);
+        return xmlConvertUtil.xmlToJson(res);
+    }
+
+    @PostMapping(value = "/v1/jsonToXml",produces = MediaType.APPLICATION_XML_VALUE)
+    public String jsonToXml(@RequestBody String reqParam){
+        return xmlConvertUtil.jsonToXML(reqParam);
+    }
+
+    @PostMapping(value = "/v2/xmlToJson",produces = MediaType.APPLICATION_JSON_VALUE)
+    public String xmlToJson2(@RequestBody String reqParam){
+        return xmlConvertUtil.xmlToJsonV2(reqParam);
+    }
+
+    @PostMapping(value = "/v1/xmlToJson",produces = MediaType.APPLICATION_JSON_VALUE)
+    public String xmlToJson(@RequestBody String reqParam){
+        return xmlConvertUtil.xmlToJson(reqParam);
+    }
+
+
+    @PostMapping(value = "/executeApi",produces = MediaType.APPLICATION_JSON_VALUE)
+    public String executeApi(@RequestBody String reqParam, HttpServletRequest request) throws IOException{
+        String contentType = request.getHeader("Content-Type").toLowerCase();
+
+        String res="{ \"result\": \"0\" }";
+        if( contentType.equalsIgnoreCase("application/xml")){
+            res = httpRequestUtil.postRequest(getRequestUrl(), reqParam);
+        }else if(contentType.equalsIgnoreCase("application/json")){
+            String reqXml = xmlConvertUtil.jsonToXML(reqParam);
+            System.out.println(reqXml);
+            reqXml= reqXml.replace("p_Params","p:Params").replace("xmlns_p","xmlns:p");
+            res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
+        }
+        return xmlConvertUtil.xmlToJson(res);
     }
 
 }
