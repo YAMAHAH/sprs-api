@@ -38,7 +38,7 @@ public class ApplicatonTask {
     @Value("${spsr.execute.mode}")
     private String envMode;
 
-    private Boolean isRetry;
+    private Boolean isRetry = false;
 
     @Scheduled(cron = "0 0 06 ? * *" )
     public void updateSecureIdTask() throws IOException {

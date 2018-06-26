@@ -41,27 +41,23 @@ public class HttpRequestUtil {
                 .addHeader("cache-control", "no-cache")
                 .build();
         Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                if (e.getCause().equals(SocketTimeoutException.class) && serversLoadTimes < maxLoadTimes)//如果超时并未超过指定次数，则重新连接
-                {
-                    serversLoadTimes++;
-                    client.newCall(call.request()).enqueue(this);
-                } else {
-                    e.printStackTrace();
-                }
-            }
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                System.out.println("连接服务器超时.");
-//                try {
-//                    throw new SpsrException("连接服务器超时,请检查网络.");
-//                } catch (SpsrException e) {
+//        call.enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                if (e.getCause().equals(SocketTimeoutException.class) && serversLoadTimes < maxLoadTimes)//如果超时并未超过指定次数，则重新连接
+//                {
+//                    serversLoadTimes++;
+//                    client.newCall(call.request()).enqueue(this);
+//                } else {
 //                    e.printStackTrace();
 //                }
-            }
-        });
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//
+//            }
+//        });
         Response response = call.execute();
         return response.body().string();
     }
