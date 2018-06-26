@@ -9,7 +9,7 @@ public class DataMapUtil {
 
     public static String getData(String key){
         if(dataMaps.containsKey(key)) return dataMaps.get(key);
-        String uId = UserLoginUtil.getKeyValue("spsr.login.sid");
+        String uId = UserLoginUtil.getKeyValue("spsr.login.secureid");
         return uId;
     }
 
