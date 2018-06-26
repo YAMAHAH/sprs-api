@@ -3,7 +3,7 @@ package com.spsrexpress.apiproxy.utils;
 import java.io.*;
 import java.util.Properties;
 
-public class UserLoginUtil {
+public class SecureIdPropertiesUtil {
     //属性文件的路径
     static String profilepath="userlogin.properties";
     /**
