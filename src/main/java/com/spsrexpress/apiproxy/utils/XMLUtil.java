@@ -69,7 +69,7 @@ public class XMLUtil {
     }
 
     public String xmlToJson(String xml){
-        JSONObject xmlJSONObj = XML.toJSONObject(xml);
+        JSONObject xmlJSONObj = XML.toJSONObject(xml,true);
         String jsonPrettyPrintString = xmlJSONObj.toString(4);
         return  jsonPrettyPrintString;
     }

@@ -1,7 +1,5 @@
 package com.spsrexpress.apiproxy.utils;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -10,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 public class AesUtil {
     private final static String encoding = "UTF-8";
@@ -46,13 +45,12 @@ public class AesUtil {
      * 加密字符串
      * */
     public static String ebotongEncrypto(String str) {
-
-        BASE64Encoder base64encoder = new BASE64Encoder();
+        Base64.Encoder base64encoder = Base64.getEncoder() ;
         String result = str;
         if (str != null && str.length() > 0) {
             try {
                 byte[] encodeByte = str.getBytes(encoding);
-                result = base64encoder.encode(encodeByte);
+                result = base64encoder.encodeToString(encodeByte);
             }catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -65,15 +63,9 @@ public class AesUtil {
      * 解密字符串
      * */
     public static String ebotongDecrypto(String str) {
-
-        BASE64Decoder base64decoder = new BASE64Decoder();
-        try {
-            byte[] encodeByte = base64decoder.decodeBuffer(str);
-            return new String(encodeByte);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return str;
-        }
+        Base64.Decoder base64decoder = Base64.getDecoder();
+        byte[] encodeByte = base64decoder.decode(str);
+        return new String(encodeByte);
     }
 
 

@@ -26,6 +26,7 @@ public class HttpRequestUtil {
             = okhttp3.MediaType.parse("application/xml; charset=utf-8");
 
     public String postRequest(String targetURL, String urlParameters) throws IOException {
+        long startTime = System.currentTimeMillis();    //获取开始时间
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .connectTimeout(connectTimeout, TimeUnit.SECONDS)
                 .readTimeout(readTimeout, TimeUnit.SECONDS)
@@ -38,27 +39,12 @@ public class HttpRequestUtil {
                 .addHeader("content-language", "ru-RU")
                 .addHeader("content-type", "application/xml")
                 .addHeader("content-length", Integer.toString(urlParameters.getBytes().length))
-                .addHeader("cache-control", "no-cache")
+//                .addHeader("cache-control", "no-cache")
                 .build();
         Call call = client.newCall(request);
-//        call.enqueue(new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                if (e.getCause().equals(SocketTimeoutException.class) && serversLoadTimes < maxLoadTimes)//如果超时并未超过指定次数，则重新连接
-//                {
-//                    serversLoadTimes++;
-//                    client.newCall(call.request()).enqueue(this);
-//                } else {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//
-//            }
-//        });
+        long endTime = System.currentTimeMillis();    //获取结束时间
         Response response = call.execute();
+        System.out.println("请求时间：" + (endTime - startTime) + "ms");
         return response.body().string();
     }
 }
