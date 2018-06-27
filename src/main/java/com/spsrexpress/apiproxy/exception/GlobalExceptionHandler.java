@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
     public ModelMap ioExceptionHandler(HttpServletRequest request, Exception e) {
         logger.error("request page url{}, params:{}, error:{}", request.getRequestURI(), request.getParameterMap(), e);
         ModelMap modelMap = new ModelMap();
-        modelMap.addAttribute("MessageCode","");
+        modelMap.addAttribute("MessageCode",HttpStatus.INTERNAL_SERVER_ERROR);
         modelMap.addAttribute("MessageText",e.getMessage());
         modelMap.addAttribute("Status",ServiceCode.EXCEPTION);
         return modelMap;

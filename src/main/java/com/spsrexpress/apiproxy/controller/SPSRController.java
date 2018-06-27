@@ -118,13 +118,7 @@ public class SPSRController {
 
         ModelMap modelMap = new ModelMap();
         String res="{ \"result\": \"0\" }";
-        if( contentType.equalsIgnoreCase("application/xml")){
-            res = httpRequestUtil.postRequest(getRequestUrl(), getInvoiceQureyXml(getLoginSecureId() ,this.username,this.contractNumber,reqParam));
-        }else if(contentType.equalsIgnoreCase("application/json")){
-            String reqXml = xmlUtil.jsonToXML(reqParam);
-            reqXml = getInvoiceQureyXml(getLoginSecureId(),this.username,contractNumber,reqXml);
-            res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
-        }
+        res = getInvoiceInfoString(reqParam, contentType, res);
         String jsonStr = xmlUtil.xmlToJson(res);
         return jsonStr;
     }
@@ -137,13 +131,7 @@ public class SPSRController {
 
         ModelMap modelMap = new ModelMap();
         String res="{ \"result\": \"0\" }";
-        if( contentType.equalsIgnoreCase("application/xml")){
-            res = httpRequestUtil.postRequest(getRequestUrl(), getInvoiceQureyXml(getLoginSecureId() ,this.username,this.contractNumber,reqParam));
-        }else if(contentType.equalsIgnoreCase("application/json")){
-            String reqXml = xmlUtil.jsonToXML(reqParam);
-            reqXml = getInvoiceQureyXml(getLoginSecureId(),this.username,contractNumber,reqXml);
-            res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
-        }
+        res = getInvoiceInfoString(reqParam, contentType, res);
         Map<String,Object> map = xmlUtil.xmlToMap(res);
         //获取指定keys的所有值
 //        String[] keys = { "_RC","_MessageCode","_MessageInfo","_Status","_ShipRefNum","_ShipmentNumber",
@@ -194,6 +182,17 @@ public class SPSRController {
         return modelMap;
     }
 
+    private String getInvoiceInfoString(@ApiParam(name = "reqParam", value = "JSON格式的参数数据", required = true) @RequestBody String reqParam, String contentType, String res) throws IOException {
+        if( contentType.equalsIgnoreCase("application/xml")){
+            res = httpRequestUtil.postRequest(getRequestUrl(), getInvoiceQureyXml(getLoginSecureId() ,this.username,this.contractNumber,reqParam));
+        }else if(contentType.equalsIgnoreCase("application/json")){
+            String reqXml = xmlUtil.jsonToXML(reqParam);
+            reqXml = getInvoiceQureyXml(getLoginSecureId(),this.username,contractNumber,reqXml);
+            res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
+        }
+        return res;
+    }
+
     @ApiOperation(value = "获取快递单跟踪信息",notes = "根据指定的请求参数获取快递单的跟踪信息")
     @PostMapping(path = "/waMonitorInvoiceInfoByNative",produces = "application/json")
     public String waMonitorInvoiceInfoByNative(@ApiParam(name = "reqParam", value = "JSON格式的参数数据", required = true)
@@ -202,6 +201,12 @@ public class SPSRController {
 
         ModelMap modelMap = new ModelMap();
         String res = "{ \"result\": \"0\" }";
+        res = getMonitorInvoiceInfoString(reqParam, contentType, res);
+        String jsonStr = xmlUtil.xmlToJson(res);
+        return jsonStr;
+    }
+
+    private String getMonitorInvoiceInfoString(@ApiParam(name = "reqParam", value = "JSON格式的参数数据", required = true) @RequestBody String reqParam, String contentType, String res) throws IOException {
         if (contentType.equalsIgnoreCase("application/xml")) {
             res = httpRequestUtil.postRequest(getRequestUrl(), getMonitorInvoiceInfoXmlParam(getLoginSecureId(), this.contractNumber, reqParam));
         } else if (contentType.equalsIgnoreCase("application/json")) {
@@ -209,9 +214,9 @@ public class SPSRController {
             reqXml = getMonitorInvoiceInfoXmlParam(getLoginSecureId(), contractNumber, reqXml);
             res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
         }
-         String jsonStr = xmlUtil.xmlToJson(res);
-         return jsonStr;
+        return res;
     }
+
     @ApiOperation(value = "获取快递单跟踪信息",notes = "根据指定的请求参数获取快递单的跟踪信息")
     @PostMapping(path = "/waMonitorInvoiceInfo",produces = "application/json")
     public ModelMap waMonitorInvoiceInfo(@ApiParam(name = "reqParam", value = "JSON格式的参数数据", required = true)
@@ -220,14 +225,8 @@ public class SPSRController {
 
         ModelMap modelMap = new ModelMap();
         String res="{ \"result\": \"0\" }";
-        if( contentType.equalsIgnoreCase("application/xml")){
-            res = httpRequestUtil.postRequest(getRequestUrl(), getMonitorInvoiceInfoXmlParam(getLoginSecureId() ,this.contractNumber,reqParam));
-        }else if(contentType.equalsIgnoreCase("application/json")){
-            String reqXml = xmlUtil.jsonToXML(reqParam);
-            reqXml = getMonitorInvoiceInfoXmlParam(getLoginSecureId(),contractNumber,reqXml);
-            res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
-        }
-       // String jsonStr = xmlUtil.xmlToJson(res);
+        res = getMonitorInvoiceInfoString(reqParam, contentType, res);
+        // String jsonStr = xmlUtil.xmlToJson(res);
        // return jsonStr;
         Map<String,Object> map = xmlUtil.xmlToMap(res);
         String rc = map.get("_RC").toString();
@@ -270,15 +269,20 @@ public class SPSRController {
     private String createInvoiceByNative(@RequestBody String reqParam, HttpServletRequest request) throws IOException {
        String contentType = request.getHeader("Content-Type").toLowerCase();
        String res = "{ \"result\": \"0\" }";
-       if (contentType.equalsIgnoreCase("application/xml")) {
-           res = httpRequestUtil.postRequest(getRequestUrl(), getCreateInvoiceAction(getLoginSecureId(), contractNumber, reqParam));
-       } else if (contentType.equalsIgnoreCase("application/json")) {
-           String reqXml = xmlUtil.jsonToXML(reqParam);
-           reqXml = getCreateInvoiceAction(getLoginSecureId(), contractNumber, reqXml);
-           res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
-       }
+       res = getCreateInvoiceString(reqParam, contentType, res);
        return xmlUtil.xmlToJson(res);
    }
+
+    private String getCreateInvoiceString(@RequestBody String reqParam, String contentType, String res) throws IOException {
+        if (contentType.equalsIgnoreCase("application/xml")) {
+            res = httpRequestUtil.postRequest(getRequestUrl(), getCreateInvoiceAction(getLoginSecureId(), contractNumber, reqParam));
+        } else if (contentType.equalsIgnoreCase("application/json")) {
+            String reqXml = xmlUtil.jsonToXML(reqParam);
+            reqXml = getCreateInvoiceAction(getLoginSecureId(), contractNumber, reqXml);
+            res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
+        }
+        return res;
+    }
 
     @ApiOperation(value = "创建并激活快递单",notes = "根据指定的请求参数创建并激活快递单")
     @PostMapping(value = "/waCreateInvoice",produces = MediaType.APPLICATION_JSON_VALUE)
@@ -289,13 +293,7 @@ public class SPSRController {
         ModelMap modelMap = new ModelMap();
         String res = "{ \"result\": \"0\" }";
         long startTime = System.currentTimeMillis();    //获取开始时间
-        if (contentType.equalsIgnoreCase("application/xml")) {
-            res = httpRequestUtil.postRequest(getRequestUrl(), getCreateInvoiceAction(getLoginSecureId(), contractNumber, reqParam));
-        } else if (contentType.equalsIgnoreCase("application/json")) {
-            String reqXml = xmlUtil.jsonToXML(reqParam);
-            reqXml = getCreateInvoiceAction(getLoginSecureId(), contractNumber, reqXml);
-            res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
-        }
+        res = getCreateInvoiceString(reqParam, contentType, res);
         long endTime = System.currentTimeMillis();    //获取结束时间
         System.out.println("程序运行时间：" + (endTime - startTime) + "ms");
         Map<String, Object> map = xmlUtil.xmlToMap(res);
