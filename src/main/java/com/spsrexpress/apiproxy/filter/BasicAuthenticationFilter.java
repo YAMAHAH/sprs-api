@@ -1,0 +1,23 @@
+package com.spsrexpress.apiproxy.filter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+public class BasicAuthenticationFilter extends OncePerRequestFilter {
+
+    public final static String authHeader = "Authorization";
+    private static final Logger logger = LoggerFactory.getLogger(BasicAuthenticationFilter.class);
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String authToken = request.getHeader(authHeader);
+        filterChain.doFilter(request, response);
+    }
+}
