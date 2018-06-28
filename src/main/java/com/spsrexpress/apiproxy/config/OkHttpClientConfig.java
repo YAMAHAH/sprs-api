@@ -16,19 +16,22 @@ public class OkHttpClientConfig {
 
     @Value("${okhttp.client.connectTimeout}")
     private long connectTimeout;
-
     @Value("${okhttp.client.readTimeout}")
     private long readTimeout;
     @Value("${okhttp.client.writeTimeout}")
     private  long writeTimeout;
 
+   // private HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+
     @Bean
     public OkHttpClient okHttpClient() {
+       // loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.connectTimeout(connectTimeout, TimeUnit.SECONDS)
                 .readTimeout(readTimeout, TimeUnit.SECONDS)
                 .writeTimeout(writeTimeout,TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
+               // .addInterceptor(loggingInterceptor)
                 .sslSocketFactory(getTrustedSSLSocketFactory(), new X509TrustManager() {
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                         X509Certificate[] x509Certificates = new X509Certificate[0];

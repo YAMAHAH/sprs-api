@@ -29,9 +29,6 @@ import java.util.Map;
 public class SPSRController {
 
     @Autowired
-    private Environment env;
-
-    @Autowired
     private XMLUtil xmlUtil;
 
     @Autowired
@@ -64,9 +61,6 @@ public class SPSRController {
     private String username;
     @Value("${spsr.login.password}")
     private String password;
-
-    @Value("${spsr.login.secureid}")
-    private String secureId;
 
     @Value("${spsr.contractnumber}")
     private String contractNumber;
@@ -265,13 +259,7 @@ public class SPSRController {
         return modelMap;
     }
 
-   @PostMapping(value = "/waCreateInvoiceByNative",produces = MediaType.APPLICATION_JSON_VALUE)
-    private String createInvoiceByNative(@RequestBody String reqParam, HttpServletRequest request) throws IOException {
-       String contentType = request.getHeader("Content-Type").toLowerCase();
-       String res = "{ \"result\": \"0\" }";
-       res = getCreateInvoiceString(reqParam, contentType, res);
-       return xmlUtil.xmlToJson(res);
-   }
+
 
     private String getCreateInvoiceString(@RequestBody String reqParam, String contentType, String res) throws IOException {
         if (contentType.equalsIgnoreCase("application/xml")) {
@@ -292,10 +280,7 @@ public class SPSRController {
 
         ModelMap modelMap = new ModelMap();
         String res = "{ \"result\": \"0\" }";
-        long startTime = System.currentTimeMillis();    //获取开始时间
         res = getCreateInvoiceString(reqParam, contentType, res);
-        long endTime = System.currentTimeMillis();    //获取结束时间
-        System.out.println("程序运行时间：" + (endTime - startTime) + "ms");
         Map<String, Object> map = xmlUtil.xmlToMap(res);
         String rc = map.get("_RC").toString();
         if (Strings.isNullOrEmpty(rc) || rc.equalsIgnoreCase("0")) {
@@ -335,6 +320,13 @@ public class SPSRController {
             modelMap.addAttribute("MessageText", errMsg);
         }
         return modelMap;
+    }
+    @PostMapping(value = "/waCreateInvoiceByNative",produces = MediaType.APPLICATION_JSON_VALUE)
+    private String createInvoiceByNative(@RequestBody String reqParam, HttpServletRequest request) throws IOException {
+        String contentType = request.getHeader("Content-Type").toLowerCase();
+        String res = "{ \"result\": \"0\" }";
+        res = getCreateInvoiceString(reqParam, contentType, res);
+        return xmlUtil.xmlToJson(res);
     }
 
     private String getMessageText(String messageCode){
