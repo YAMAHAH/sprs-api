@@ -2,10 +2,7 @@ package com.spsrexpress.apiproxy.controller;
 
 import com.google.common.base.Strings;
 import com.spsrexpress.apiproxy.exception.SpsrException;
-import com.spsrexpress.apiproxy.utils.HttpRequestUtil;
-import com.spsrexpress.apiproxy.utils.MapUtil;
-import com.spsrexpress.apiproxy.utils.SecureIdStore;
-import com.spsrexpress.apiproxy.utils.XMLUtil;
+import com.spsrexpress.apiproxy.utils.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.json.JSONArray;
@@ -18,6 +15,9 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -91,7 +91,14 @@ public class SPSRController {
     }
 
     @PostMapping(path="/waLogin",produces = "application/json")
-    public ModelMap waLogin() throws IOException{
+    public ModelMap waLogin() throws IOException, ScriptException, NoSuchMethodException {
+        String jsPath = this.getClass().getClassLoader().getResource("/js/spsr-client.js").getPath();
+        String jsonStr = "{ \"result\": \"0\" }";;
+        Invocable invocable = new JSUtil().getInvocable(jsPath);
+        System.out.println(invocable.invokeFunction("responseHandler",jsonStr));
+        Object scope = ((ScriptEngine)invocable).get("spsrClient");
+        Object result = invocable.invokeMethod(scope, "test");
+        System.out.println(result);
         ModelMap map = new ModelMap();
         String SID = getLoginSecureId();
         if(Strings.isNullOrEmpty(SID)){
@@ -101,6 +108,7 @@ public class SPSRController {
             map.addAttribute("status","succeed");
             map.addAttribute("SID",SID);
         }
+
         return map;
     }
 

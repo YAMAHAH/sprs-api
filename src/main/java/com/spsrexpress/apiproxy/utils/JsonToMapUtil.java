@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class JsonToMapUtil {
-    /**保存解析完成后的map对象*/
     private Map<String,Object> maps=new HashMap<String, Object>();
     /**
      * 是否区分属性名大小写,默认区分
@@ -35,10 +34,10 @@ public class JsonToMapUtil {
     public JsonToMapUtil(String value,boolean hasTransform) throws JsonToMapException {
         this.hasTransform=hasTransform;
         if(value==null||"".equals(value.trim())){
-            throw new JsonToMapException("处理的字符串不能为空,我怀疑你是个假程序员");
+            throw new JsonToMapException("处理的字符串不能为空");
         }
         if(value.trim().indexOf('[')==0){//json数组
-            JSONArray jarray=new  JSONArray(value);// fromObject(value);
+            JSONArray jarray=new  JSONArray(value);
             jsonArrayToMap(jarray,maps,"");
         }else{//json数据
             JSONObject jobj=new JSONObject(value);
@@ -50,12 +49,11 @@ public class JsonToMapUtil {
      * 将json转换成map
      * @param value
      */
-    private Map<String,Object> jsonToMap(JSONObject jsonobj){
-        Map<String,Object> map =jsonobj.toMap();
-        //从map里面创建一个副本用于遍历，如果使用原来的map，会抛出java.util.ConcurrentModificationException,map迭代遍历时不能做增加、删除操作
-        Map<String,Object> clonemap=new HashMap<String, Object>(map);
-        //遍历map，处理JSONObject和JSONArray
-        for(Map.Entry<String,Object> m:clonemap.entrySet()){
+    private Map<String,Object> jsonToMap(JSONObject jsonObject){
+        Map<String,Object> map =jsonObject.toMap();
+        Map<String,Object> cloneMap=new HashMap<String, Object>(map);
+
+        for(Map.Entry<String,Object> m:cloneMap.entrySet()){
             Object o=m.getValue();
             if(o instanceof JSONObject){
                 map.put(hasTransform?m.getKey():m.getKey().toLowerCase(),jsonToMap((JSONObject)o));
@@ -108,7 +106,7 @@ public class JsonToMapUtil {
      */
     public <T> T getProperty(String propertyName,Map<String,Object> map) throws JsonToMapException{
         if(propertyName==null||"".equals(propertyName.trim())){
-            throw new JsonToMapException("属性名不能为空，我怀疑你是个假程序员");
+            throw new JsonToMapException("属性名不能为空.");
         }
         if(!hasTransform){
             propertyName=propertyName.toLowerCase();
@@ -117,7 +115,7 @@ public class JsonToMapUtil {
         String[] propertys=propertyName.split("\\.");
         for(int i=0;i<propertys.length;i++){
             if(o instanceof Map==false){
-                System.out.println("未知的属性名(怪我没解析出来):"+propertys[i]);
+                System.out.println("未知的属性名:"+propertys[i]);
                 return null;
             }
             o=((Map<String,Object>)o).get(propertys[i]);
