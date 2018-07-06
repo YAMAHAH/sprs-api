@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.script.Invocable;
@@ -431,6 +432,23 @@ public class SPSRController {
             res = httpRequestUtil.postRequest(getRequestUrl(), reqXml);
         }
         return xmlUtil.xmlToJson(res);
+    }
+
+    //ftp处理文件上传
+    @RequestMapping(value="/ftpFileUpload", method = RequestMethod.POST)
+    public @ResponseBody String uploadImg(@RequestParam("file") MultipartFile file,
+                                          HttpServletRequest request) throws IOException {
+
+        String fileName = file.getOriginalFilename();
+        InputStream inputStream=file.getInputStream();
+        String filePath=null;
+
+        Boolean flag=FtpFileUtil.uploadFile(fileName,inputStream);
+        if(flag==true){
+            System.out.println("ftp上传成功！");
+            filePath=fileName;
+        }
+        return  filePath;  //该路径图片名称，前端框架可用ngnix指定的路径+filePath,即可访问到ngnix图片服务器中的图片
     }
 
 }
